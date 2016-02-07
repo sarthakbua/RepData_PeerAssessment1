@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>read file</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<p>install.packages(&ldquo;dplyr&rdquo;)
+library(dplyr)
+library(ggplot2)
+setwd(&ldquo;D:\Coursera\Reproducible-Research\repdata-data-activity&rdquo;)</p>
+
+<h3>read file</h3>
+
+<p>act &lt;- read.csv(&ldquo;activity.csv&rdquo;, header = TRUE, stringsAsFactors = FALSE)
+str(act)
+act$date&lt;- as.Date(act$date,&#39;%Y-%m-%d&#39;)
+act$steps&lt;-as.numeric(act$steps)
+head(act)</p>
+
+<h2>What is mean total number of steps taken per day?</h2>
+
+<p>##Calculate the total number of steps taken per day
+##If you do not understand the difference between a histogram and a barplot,
+##research the difference between them. Make a histogram of the total number of 
+##steps taken each day
+##Calculate and report the mean and median of the total number of 
+##steps taken per day</p>
+
+<p>nrow(act)</p>
+
+<p>sum(is.na(act$steps))
+sum(is.na(as.character(act$Date)) )
+sum(is.na(act$interval))</p>
+
+<p>act_nan&lt;- act[which(!is.na(act$steps)),] ### removing null rows
+str(act_nan)
+act_nan
+head(act_nan)</p>
+
+<p>##perday_stps&lt;-tapply(act_nan$steps,act_nan$date)</p>
+
+<p>perday_stps&lt;-aggregate(steps ~ date, act_nan , sum)</p>
+
+<p>head(perday_stps)</p>
+
+<p>png(&ldquo;perday_stps.png&rdquo;, width=520, height=480)</p>
+
+<p>ggplot(perday_stps, aes(x= steps)) +
+  geom_histogram(fill=&ldquo;lightblue&rdquo;,binwidth=800) + 
+  ggtitle(&#39;Total number of steps taken per day&#39;) + xlab(&ldquo;Steps&rdquo;) +
+  ylab(&ldquo;frequency&rdquo;)
+dev.off()</p>
+
+<p>mean(perday_stps$steps, na.rm = TRUE) ###10766.19
+median(perday_stps$steps, na.rm = TRUE)### 10765</p>
+
+<p>###What is the average daily activity pattern?</p>
+
+<p>avg_intr_stpes&lt;-aggregate(steps ~ interval, act_nan , mean)</p>
+
+<p>png(&ldquo;avg_step.png&rdquo;, width=520, height=480)</p>
+
+<p>ggplot(avg_intr_stpes , aes(interval, steps, color = &ldquo;red&rdquo;)) +
+   geom_line() + xlab(&ldquo;year&rdquo;) + ylab(&ldquo;Average number of steps&rdquo;) +
+   ggtitle(&ldquo; Daily Activity Pattern&rdquo;)
+ dev.off()</p>
+
+<p>head(avg_intr_stpes)
+max(avg_intr_stpes$steps)#### max steps 206.1698</p>
+
+<h3>Imputing missing values</h3>
+
+<h2>total NA</h2>
+
+<p>sum(is.na(act$steps))   ##2304</p>
+
+<p>sum(is.na(act)) ##2304
+head(act)
+act_all &lt;- act
+act_all[which(is.na(act_all$steps)),1]&lt;- mean(act_all$steps, na.rm = TRUE)
+sum(is.na(act_all)) ## no of null 0 </p>
+
+<p>max(act_all$interval) ##2355</p>
+
+<p>##What is the impact of imputing missing data 
+##on the estimates of the total daily number of steps?</p>
+
+<p>png(&ldquo;Compare_null_no_null.png&rdquo;, width=640, height=480)</p>
+
+<p>par(mfrow=c(1,2))</p>
+
+<p>hist(perday_stps$steps,10,
+     main = &ldquo;Total number of steps taken per day&rdquo;, xlab = &ldquo;Steps&rdquo;,ylim =c(0, 25)
+     ) 
+abline(v=median(perday_stps$steps),col = 4, lwd = 4)</p>
+
+<p>perday_stps_nona &lt;-aggregate(steps ~ date, act_all , sum)</p>
+
+<p>hist(perday_stps_nona$steps,10,
+     main = &ldquo;Total number of steps taken per day
+      After filling  NULL&rdquo;, xlab = &ldquo;Steps&rdquo;,ylim =c(0, 25) 
+) 
+abline(v=median(perday_stps_nona$steps),col = 4, lwd = 4)</p>
+
+<p>dev.off()</p>
+
+<p>mean(perday_stps$steps) ## 10766.19
+median(perday_stps$steps)## 10765</p>
+
+<p>mean(perday_stps_nona$steps) ##10766.19
+median(perday_stps_nona$steps) ## 10766.19</p>
+
+<p>mean(perday_stps$steps)-mean(perday_stps_nona$steps) ###0 
+median(perday_stps$steps)-median(perday_stps_nona$steps)## small difference</p>
+
+<p>###Are there differences in activity patterns between weekdays and weekends?
+act_all$date&lt;- as.Date(act_all$date,&#39;%Y-%m-%d&#39;)
+act_all&lt;- mutate(act_all, wk_typ= ifelse(weekdays(act_all$date)
+        == &ldquo;Saturday&rdquo; | weekdays(act_all$date) ==&ldquo;Sunday&rdquo;, &ldquo;weekend&rdquo;,
+        &ldquo;weekday&rdquo;))
+head(act_all)</p>
+
+<p>act_all$wk_typ&lt;- as.factor(act_all$wk_typ)</p>
+
+<p>head(act_all)</p>
+
+<p>act_weekty&lt;- aggregate(steps ~ interval + wk_typ , act_all , mean)</p>
+
+<p>png(&ldquo;weekly-comapre.png&rdquo;, width=640, height=640)
+ggplot(act_weekty, aes(x=interval,y=steps ,color =wk_typ)) +
+      geom_line() + ggtitle( &ldquo;Daily Activity Pattern on Weekday &amp; Weekend &rdquo;) +
+      facet_wrap(~wk_typ, ncol = 1, nrow=2)
+dev.off() </p>
+
+<p>png(&ldquo;weekly-comapre_2.png&rdquo;, width=640, height=480)
+ggplot(act_weekty, aes(x=interval,y=steps ,color =wk_typ)) +
+  geom_line() + ggtitle( &ldquo;Daily Activity Pattern on Weekday &amp; Weekend &rdquo;)<br/>
+dev.off() </p>
+
+</body>
+
+</html>
