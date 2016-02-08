@@ -1,4 +1,8 @@
-
+---
+title: "PA1.html"
+output: html_document
+keep_md: TRUE
+---
 ```{r, echo= TRUE}
 
 ## install.packages("knitr")
